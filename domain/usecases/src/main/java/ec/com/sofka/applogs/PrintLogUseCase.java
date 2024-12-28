@@ -1,10 +1,20 @@
 package ec.com.sofka.applogs;
 
-//18. UseCase for printing logs
+import ec.com.sofka.Log;
+import ec.com.sofka.gateway.LogRepository;
+
+import java.time.LocalDateTime;
+
 public class PrintLogUseCase{
 
-    public void accept(String message){
-        //Print the message
-        System.out.println("Message received: " + message);
+    private final LogRepository logRepository;
+
+    public PrintLogUseCase(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
+
+    public void accept(String entity, String message){
+        Log log = new Log(message, entity, LocalDateTime.now());
+        logRepository.create(log).subscribe();
     }
 }

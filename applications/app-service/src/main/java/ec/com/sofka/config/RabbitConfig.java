@@ -1,38 +1,94 @@
 package ec.com.sofka.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import ec.com.sofka.RabbitProperties;
+import jakarta.annotation.PostConstruct;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//2. Create class to configure RabbitMQ here in app layer: To generate beans
 @Configuration
 public class RabbitConfig {
-    //3. Configurations: Environment variables - Names must follow a pattern like this
-    // Each queue must have its own name - Broker admin must create this and provide us as info to connect later
-    public static final String EXCHANGE_NAME = "example.exchange";
-    public static final String QUEUE_NAME = "example.queue";
-    public static final String ROUTING_KEY = "example.routingKey";
 
-    //4. Exchange configuration
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+    private final RabbitProperties rabbitProperties;
+
+    public RabbitConfig(RabbitProperties rabbitProperties) {
+        this.rabbitProperties = rabbitProperties;
     }
 
-    //5. Queue configuration: As many queues you have - ofc you can have more than one and each one must have its proper name
-    //2nd param here: durable - Queue will survive a broker restart
+
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE_NAME, true);
+    public TopicExchange userExchange() {
+        return new TopicExchange(rabbitProperties.getUserExchange());
     }
 
-    //6. Binding configuration: Connects queue with exchange - As many bindings as queues I have
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    public Queue userQueue() {
+        return new Queue(rabbitProperties.getUserQueue(), true);
     }
 
+    @Bean
+    public Binding userBinding() {
+        return BindingBuilder.bind(userQueue())
+                .to(userExchange())
+                .with(rabbitProperties.getUserRoutingKey());
+    }
+
+    @Bean
+    public TopicExchange accountExchange() {
+        return new TopicExchange(rabbitProperties.getAccountExchange());
+    }
+
+    @Bean
+    public Queue accountQueue() {
+        return new Queue(rabbitProperties.getAccountQueue(), true);
+    }
+
+    @Bean
+    public Binding accountBinding() {
+        return BindingBuilder.bind(accountQueue())
+                .to(accountExchange())
+                .with(rabbitProperties.getAccountRoutingKey());
+    }
+
+    @Bean
+    public TopicExchange transactionExchange() {
+        return new TopicExchange(rabbitProperties.getTransactionExchange());
+    }
+
+    @Bean
+    public Queue transactionQueue() {
+        return new Queue(rabbitProperties.getTransactionQueue(), true);
+    }
+
+    @Bean
+    public Binding transactionBinding() {
+        return BindingBuilder.bind(transactionQueue())
+                .to(transactionExchange())
+                .with(rabbitProperties.getTransactionRoutingKey());
+    }
+
+    @Bean
+    public ApplicationListener<ApplicationReadyEvent> initializeBeans(AmqpAdmin amqpAdmin) {
+        return event -> {
+            amqpAdmin.declareExchange(userExchange());
+            amqpAdmin.declareQueue(userQueue());
+            amqpAdmin.declareBinding(userBinding());
+
+            amqpAdmin.declareExchange(accountExchange());
+            amqpAdmin.declareQueue(accountQueue());
+            amqpAdmin.declareBinding(accountBinding());
+
+            amqpAdmin.declareExchange(transactionExchange());
+            amqpAdmin.declareQueue(transactionQueue());
+            amqpAdmin.declareBinding(transactionBinding());
+        };
+    }
 }
