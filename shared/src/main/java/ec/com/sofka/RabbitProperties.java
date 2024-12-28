@@ -1,8 +1,10 @@
 package ec.com.sofka;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource("classpath:rabbit-config.properties")
 public class RabbitProperties {
 
     @Value("${user.exchange.name}")

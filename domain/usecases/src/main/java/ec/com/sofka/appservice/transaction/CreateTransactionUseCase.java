@@ -6,6 +6,7 @@ import ec.com.sofka.TransactionStrategyFactory;
 import ec.com.sofka.appservice.exception.BadRequestException;
 import ec.com.sofka.appservice.exception.NotFoundException;
 import ec.com.sofka.gateway.AccountRepository;
+import ec.com.sofka.gateway.BusMessage;
 import ec.com.sofka.gateway.TransactionRepository;
 import reactor.core.publisher.Mono;
 
@@ -17,11 +18,13 @@ public class CreateTransactionUseCase {
     private final TransactionRepository repository;
     private final AccountRepository accountRepository;
     private final TransactionStrategyFactory strategyFactory;
+    private final BusMessage busMessage;
 
-    public CreateTransactionUseCase(TransactionRepository repository, AccountRepository accountRepository, TransactionStrategyFactory strategyFactory) {
+    public CreateTransactionUseCase(TransactionRepository repository, AccountRepository accountRepository, TransactionStrategyFactory strategyFactory, BusMessage busMessage) {
         this.repository = repository;
         this.accountRepository = accountRepository;
         this.strategyFactory = strategyFactory;
+        this.busMessage = busMessage;
     }
 
     public Mono<Transaction> apply(Transaction transaction){
@@ -43,6 +46,7 @@ public class CreateTransactionUseCase {
 
                     return repository.create(transaction)
                             .flatMap(savedTransaction -> {
+                                busMessage.sendMsg("transaction", "Transaction created with id: " + savedTransaction.getId());
                                 account.setBalance(balance);
                                 return accountRepository.create(account)
                                         .thenReturn(transaction);
