@@ -1,22 +1,46 @@
 package ec.com.sofka;
 
-import ec.com.sofka.applogs.PrintLogUseCase;
-import ec.com.sofka.gateway.BusMessageListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ec.com.sofka.applogs.logs.PrintLogUseCase;
+import ec.com.sofka.applogs.gateway.BusMessageListener;
+import ec.com.sofka.utils.QueueManager;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
-//20. Create the BusListener class
-@Service
-public class BusListener implements BusMessageListener{
-    private final PrintLogUseCase printLogUseCase;
+import java.util.Map;
 
-    public BusListener(PrintLogUseCase printLogUseCase) {
+@Service
+public class BusListener implements BusMessageListener {
+
+    private final PrintLogUseCase printLogUseCase;
+    private final QueueManager queueManager;
+
+    public BusListener(PrintLogUseCase printLogUseCase, QueueManager queueManager) {
         this.printLogUseCase = printLogUseCase;
+        this.queueManager = queueManager;
     }
-    //23. Implement the receiveMsg method with the usecase
+
     @Override
-    @RabbitListener(queues = "example.queue")
-    public void receiveMsg(String message) {
-        printLogUseCase.accept(message);
+    @RabbitListener(queues = "#{@queueManager.getAllQueues()}")
+    public void receiveMsg(String payload) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            // Convierte el payload JSON a un mapa
+            Map<String, String> messageMap = mapper.readValue(payload, new TypeReference<>() {});
+            String entity = messageMap.get("entity");
+            String message = messageMap.get("message");
+
+            // Llama al caso de uso con los datos procesados
+            printLogUseCase.accept(entity, message);
+        } catch (JsonProcessingException e) {
+            // Manejo de errores al procesar el mensaje
+            System.err.println("Error processing message payload: " + e.getMessage());
+        } catch (Exception e) {
+            // Manejo de cualquier otra excepción
+            System.err.println("Unexpected error in message listener: " + e.getMessage());
+        }
     }
 }
