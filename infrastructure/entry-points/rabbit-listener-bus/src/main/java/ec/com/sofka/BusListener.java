@@ -1,22 +1,37 @@
 package ec.com.sofka;
 
-import ec.com.sofka.applogs.PrintLogUseCase;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ec.com.sofka.applogs.CreateLogUseCase;
 import ec.com.sofka.gateway.BusMessageListener;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
-//20. Create the BusListener class
-@Service
-public class BusListener implements BusMessageListener{
-    private final PrintLogUseCase printLogUseCase;
+import java.util.Map;
 
-    public BusListener(PrintLogUseCase printLogUseCase) {
-        this.printLogUseCase = printLogUseCase;
+@Service
+public class BusListener implements BusMessageListener {
+    private final CreateLogUseCase createLogUseCase;
+    private final RabbitProperties rabbitProperties;
+
+    public BusListener(CreateLogUseCase createLogUseCase, RabbitProperties rabbitProperties) {
+        this.createLogUseCase = createLogUseCase;
+        this.rabbitProperties = rabbitProperties;
     }
-    //23. Implement the receiveMsg method with the usecase
+
     @Override
-    @RabbitListener(queues = "example.queue")
-    public void receiveMsg(String message) {
-        printLogUseCase.accept(message);
+    @RabbitListener(queues = "#{@rabbitProperties.getAllQueues()}")
+    public void receiveMsg(String payload) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, String> messageMap = mapper.readValue(payload, new TypeReference<>() {});
+            String entity = messageMap.get("entity");
+            String message = messageMap.get("message");
+
+            createLogUseCase.accept(entity, message);
+        } catch (JsonProcessingException e) {
+            System.err.println("Error processing message payload: " + e.getMessage());
+        }
     }
 }
