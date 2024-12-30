@@ -1,10 +1,19 @@
 package ec.com.sofka.applogs;
 
-//18. UseCase for printing logs
+import ec.com.sofka.gateway.LogRepository;
+import ec.com.sofka.Log;
+import reactor.core.publisher.Mono;
+
 public class PrintLogUseCase{
 
-    public void accept(String message){
-        //Print the message
-        System.out.println("Message received: " + message);
+    private final LogRepository logRepository;
+
+    public PrintLogUseCase(LogRepository logRepository){
+        this.logRepository = logRepository;
+    }
+
+    public Mono<Void> accept(Log log){
+        System.out.println("Message received: " + log.getEntity() + " - " + log.getMessage());
+        return logRepository.saveLog(log);
     }
 }

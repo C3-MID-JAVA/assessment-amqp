@@ -2,18 +2,32 @@ package ec.com.sofka;
 
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Account {
     private String id;
     private BigDecimal balance;
     private String accountNumber;
-    private String owner;
+    private String accountHolder;
+    private List<Transaction> transactions = new ArrayList<>();
 
-    public Account(String id, BigDecimal balance, String owner, String accountNumber) {
+    public Account() {
+    }
+
+    public Account(String id, BigDecimal balance, String accountHolder, String accountNumber) {
         this.id = id;
         this.balance = balance;
-        this.owner = owner;
+        this.accountHolder = accountHolder;
         this.accountNumber = accountNumber;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public BigDecimal getBalance() {
@@ -32,11 +46,20 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getAccountHolder() {
+        return accountHolder;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setAccountHolder(String accountHolder) {
+        this.accountHolder = accountHolder;
     }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
 }

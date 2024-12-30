@@ -1,38 +1,70 @@
 package ec.com.sofka.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import ec.com.sofka.RabbitEnvProps;
+import org.springframework.amqp.core.*;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//2. Create class to configure RabbitMQ here in app layer: To generate beans
 @Configuration
 public class RabbitConfig {
-    //3. Configurations: Environment variables - Names must follow a pattern like this
-    // Each queue must have its own name - Broker admin must create this and provide us as info to connect later
-    public static final String EXCHANGE_NAME = "example.exchange";
-    public static final String QUEUE_NAME = "example.queue";
-    public static final String ROUTING_KEY = "example.routingKey";
 
-    //4. Exchange configuration
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+    private final RabbitEnvProps envProperties;
+
+    public RabbitConfig(RabbitEnvProps envProperties) {
+        this.envProperties = envProperties;
     }
 
-    //5. Queue configuration: As many queues you have - ofc you can have more than one and each one must have its proper name
-    //2nd param here: durable - Queue will survive a broker restart
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE_NAME, true);
+    public TopicExchange accountExchange() {
+        return new TopicExchange(envProperties.getAccountExchange(), true, false);
     }
 
-    //6. Binding configuration: Connects queue with exchange - As many bindings as queues I have
+
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    public Queue accountQueue() {
+        return new Queue(envProperties.getAccountQueue(), true);
+    }
+
+    @Bean
+    public Binding accountBinding() {
+        return BindingBuilder.bind(accountQueue())
+                .to(accountExchange())
+                .with(envProperties.getAccountRoutingKey());
+    }
+
+    @Bean
+    public TopicExchange transactionExchange() {
+        return new TopicExchange(envProperties.getTransactionExchange(), true, false);
+    }
+
+
+    @Bean
+    public Queue transactionQueue() {
+        return new Queue(envProperties.getTransactionQueue(), true);
+    }
+
+    @Bean
+    public Binding transactionBinding() {
+        return BindingBuilder.bind(transactionQueue())
+                .to(transactionExchange())
+                .with(envProperties.getTransactionRoutingKey());
+    }
+
+    @Bean
+    public ApplicationListener<ApplicationReadyEvent> initializeBeans(AmqpAdmin amqpAdmin) {
+        return event -> {
+
+
+            amqpAdmin.declareExchange(accountExchange());
+            amqpAdmin.declareQueue(accountQueue());
+            amqpAdmin.declareBinding(accountBinding());
+
+            amqpAdmin.declareExchange(transactionExchange());
+            amqpAdmin.declareQueue(transactionQueue());
+            amqpAdmin.declareBinding(transactionBinding());
+        };
     }
 
 }
