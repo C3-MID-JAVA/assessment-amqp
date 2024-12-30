@@ -49,7 +49,7 @@ public class CreateTransactionUseCase {
                                 busMessage.sendMsg("transaction", "Transaction created with id: " + savedTransaction.getId());
                                 account.setBalance(balance);
                                 return accountRepository.create(account)
-                                        .thenReturn(transaction);
+                                        .thenReturn(savedTransaction);
                             });
                 });
     }
