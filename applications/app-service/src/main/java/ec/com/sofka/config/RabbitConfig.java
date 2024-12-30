@@ -1,4 +1,4 @@
-package ec.com.sofka.config;
+/*package ec.com.sofka.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -32,7 +32,55 @@ public class RabbitConfig {
     //6. Binding configuration: Connects queue with exchange - As many bindings as queues I have
     @Bean
     public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+        return BindingBuilder.bind(queue)
+                .to(exchange)
+                .with(ROUTING_KEY);
     }
 
+}*/
+
+package ec.com.sofka.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitConfig {
+
+    //3. Configurations: Environment variables - Names must follow a pattern like this
+    // Each queue must have its own name - Broker admin must create this and provide us as info to connect later
+
+    @Value("${app.EXCHANGE_NAME}")
+    private String exchangeName;
+
+    @Value("${app.QUEUE_NAME}")
+    private String queueName;
+
+    @Value("${app.ROUTING_KEY}")
+    private String routingKey;
+
+    //4. Exchange configuration
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange(exchangeName);
+    }
+    //5. Queue configuration: As many queues you have - ofc you can have more than one and each one must have its proper name
+    //2nd param here: durable - Queue will survive a broker restart
+    @Bean
+    public Queue queue() {
+        return new Queue(queueName, true);
+    }
+    //6. Binding configuration: Connects queue with exchange - As many bindings as queues I have
+    @Bean
+    public Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue)
+                .to(exchange)
+                .with(routingKey);
+    }
 }
+

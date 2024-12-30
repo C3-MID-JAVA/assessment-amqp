@@ -9,6 +9,8 @@ public class Account {
     private String accountNumber;
     private String owner;
 
+    public Account() {
+    }
     public Account(String id, BigDecimal balance, String owner, String accountNumber) {
         this.id = id;
         this.balance = balance;
@@ -16,6 +18,13 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     public BigDecimal getBalance() {
         return balance;
     }
