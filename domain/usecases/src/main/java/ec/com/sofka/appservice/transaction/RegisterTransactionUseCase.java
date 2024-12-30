@@ -57,7 +57,7 @@ public Mono<Transaction> apply(String accountNumber, Transaction transaction) {
 
                     account.setBalance(account.getBalance().subtract(transaction.getAmount()).subtract(fee));
 
-                    Log log = new Log("New transaction was registered with id: " + transaction.getId(), "transaction", null);
+                    Log log = new Log("New transaction was registered for account: " + newTransaction.getAccount().getAccountNumber(), "transaction", null);
                     busMessage.sendMsg(log);
                     return accountRepository.save(account)
                             .then(transactionRepository.save(newTransaction))
