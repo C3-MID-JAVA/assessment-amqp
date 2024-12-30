@@ -1,6 +1,7 @@
 dependencies {
     //24. Don't forget to implement projects that are related to
     implementation project(':usecases')
+    implementation project (':mongo-repository')
     implementation project(':rabbit-listener-bus')
 
     implementation("org.springframework.boot:spring-boot-starter")

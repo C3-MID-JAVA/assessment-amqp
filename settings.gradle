@@ -9,11 +9,20 @@ findProject(':model').projectDir = file('./domain/model')
 include ':usecases'
 findProject(':usecases').projectDir = file('./domain/usecases')
 
+include ':strategy'
+findProject(':strategy').projectDir = file('./domain/strategy')
+
+include ':exception'
+findProject(':exception').projectDir = file('./domain/exception')
+
 include ':mongo-repository'
 findProject(':mongo-repository').projectDir = file('./infrastructure/driven-adapters/mongo-repository')
 
 include ':web'
 findProject(':web').projectDir = file('./infrastructure/entry-points/web')
+
+include ':exceptions'
+findProject(':exceptions').projectDir = file('./infrastructure/exceptions')
 
 //9. Add the RabbitMQ driven adapter to the settings.gradle file
 include ':rabbit-info-bus'
@@ -26,3 +35,6 @@ findProject(':app-logs').projectDir = file('./applications/app-logs')
 //19. Add the new app related to logs: The producer
 include ':rabbit-listener-bus'
 findProject(':rabbit-listener-bus').projectDir = file('./infrastructure/entry-points/rabbit-listener-bus')
+
+include ':properties'
+findProject(':properties').projectDir = file('./properties')
