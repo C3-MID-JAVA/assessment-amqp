@@ -4,6 +4,7 @@ package ec.com.sofka;
 //import ec.com.sofka.config.RabbitConfig;
 import ec.com.sofka.gateway.BusMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -14,6 +15,11 @@ public class BusAdapter implements BusMessage {
     //13. Use of RabbitTemplate to define the sendMsg method
     private final RabbitTemplate rabbitTemplate;
 
+    @Value("${exchange.name}")
+    private String exchangeName;
+    @Value("${routing.key}")
+    private String routingKey;
+
     public BusAdapter(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -21,8 +27,8 @@ public class BusAdapter implements BusMessage {
     @Override
     public void sendMsg(String message) {
         //14. Calling the config done on app, but this must be managed through Environment Variables.
-        rabbitTemplate.convertAndSend("example.exchange",
-                "example.routingKey", //Here you can define a pattern for routing keys to be considered: example.**
+        rabbitTemplate.convertAndSend(exchangeName,
+                routingKey, //Here you can define a pattern for routing keys to be considered: example.**
                 message);
     }
 }
