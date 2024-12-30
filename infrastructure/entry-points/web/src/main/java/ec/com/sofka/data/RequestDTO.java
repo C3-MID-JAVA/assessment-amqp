@@ -3,23 +3,23 @@ package ec.com.sofka.data;
 import java.math.BigDecimal;
 
 public class RequestDTO {
-    public String customer;
+    public String accountHolder;
     public String account;
     public BigDecimal balance;
 
-    public RequestDTO(String customer, String account, BigDecimal balance) {
-        this.customer = customer;
+    public RequestDTO(String accountHolder, String account, BigDecimal balance) {
+        this.accountHolder = accountHolder;
         this.account = account;
         this.balance = balance;
     }
 
 
     public String getCustomer() {
-        return customer;
+        return accountHolder;
     }
 
-    public void setCustomer(String customer) {
-        this.customer = customer;
+    public void setCustomer(String owner) {
+        this.accountHolder = owner;
     }
 
     public String getAccount() {

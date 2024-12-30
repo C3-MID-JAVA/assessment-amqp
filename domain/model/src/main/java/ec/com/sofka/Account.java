@@ -1,19 +1,37 @@
 package ec.com.sofka;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.math.BigDecimal;
 
 public class Account {
     private String id;
     private BigDecimal balance;
     private String accountNumber;
-    private String owner;
+    private String accountHolder;
 
-    public Account(String id, BigDecimal balance, String owner, String accountNumber) {
+    @JsonCreator
+    public Account(String id,
+                   BigDecimal balance,
+                   String owner)
+    {
         this.id = id;
         this.balance = balance;
-        this.owner = owner;
-        this.accountNumber = accountNumber;
+        this.accountHolder = owner;
+    }
+
+    @JsonCreator
+    public Account(String bankAccountId) {
+        this.id = bankAccountId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public BigDecimal getBalance() {
@@ -33,10 +51,10 @@ public class Account {
     }
 
     public String getOwner() {
-        return owner;
+        return accountHolder;
     }
 
     public void setOwner(String owner) {
-        this.owner = owner;
+        this.accountHolder = owner;
     }
 }
