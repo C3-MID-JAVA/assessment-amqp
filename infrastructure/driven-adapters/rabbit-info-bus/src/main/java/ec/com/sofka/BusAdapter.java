@@ -1,28 +1,50 @@
 package ec.com.sofka;
 
-//Cuidao, esto dio dependencia circular. Toca colocar por fin práctico los nombres como están en la clase RabbitConfig
-//import ec.com.sofka.config.RabbitConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ec.com.sofka.gateway.BusMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 
-//11. BusMessage implementation, this is a service so, don't forget the annotation
+
 @Service
 public class BusAdapter implements BusMessage {
 
-    //13. Use of RabbitTemplate to define the sendMsg method
     private final RabbitTemplate rabbitTemplate;
+    private final RabbitEnvProps envProperties;
 
-    public BusAdapter(RabbitTemplate rabbitTemplate) {
+    public BusAdapter(RabbitTemplate rabbitTemplate, RabbitEnvProps envProperties) {
         this.rabbitTemplate = rabbitTemplate;
+        this.envProperties = envProperties;
     }
 
     @Override
-    public void sendMsg(String message) {
-        //14. Calling the config done on app, but this must be managed through Environment Variables.
-        rabbitTemplate.convertAndSend("example.exchange",
-                "example.routingKey", //Here you can define a pattern for routing keys to be considered: example.**
-                message);
+    public void sendMsg(Log log) {
+        String exchange = switch (log.getEntity()) {
+            case "account" -> envProperties.getAccountExchange();
+            case "transaction" -> envProperties.getTransactionExchange();
+            default -> throw new IllegalArgumentException("Invalid entity type: " + log.getEntity());
+        };
+
+        String routingKey = switch (log.getEntity()) {
+            case "account" -> envProperties.getAccountRoutingKey();
+            case "transaction" -> envProperties.getTransactionRoutingKey();
+            default -> throw new IllegalArgumentException("Invalid entity type: " + log.getEntity());
+        };
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String payload = mapper.writeValueAsString(Map.of(
+                    "entity", log.getEntity(),
+                    "message", log.getMessage()
+            ));
+            rabbitTemplate.convertAndSend(exchange, routingKey, payload);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error creating payload", e);
+        }
     }
+
 }

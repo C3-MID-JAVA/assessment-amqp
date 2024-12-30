@@ -1,7 +1,7 @@
 package ec.com.sofka.gateway;
 
-//7. New gateway to establish the link for the outside just as we do with repository
+import ec.com.sofka.Log;
+
 public interface BusMessage {
-    //It's a void bc does an action
-    void sendMsg(String message);
+    void sendMsg(Log log);
 }
