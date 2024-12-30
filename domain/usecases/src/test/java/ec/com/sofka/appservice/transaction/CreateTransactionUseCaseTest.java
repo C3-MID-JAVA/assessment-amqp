@@ -1,4 +1,4 @@
-package ec.com.sofka.transaction;
+package ec.com.sofka.appservice.transaction;
 
 import ec.com.sofka.*;
 import ec.com.sofka.appservice.exception.BadRequestException;

@@ -3,7 +3,7 @@ package ec.com.sofka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ec.com.sofka.applogs.PrintLogUseCase;
+import ec.com.sofka.applogs.CreateLogUseCase;
 import ec.com.sofka.gateway.BusMessageListener;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -12,11 +12,11 @@ import java.util.Map;
 
 @Service
 public class BusListener implements BusMessageListener {
-    private final PrintLogUseCase printLogUseCase;
+    private final CreateLogUseCase createLogUseCase;
     private final RabbitProperties rabbitProperties;
 
-    public BusListener(PrintLogUseCase printLogUseCase, RabbitProperties rabbitProperties) {
-        this.printLogUseCase = printLogUseCase;
+    public BusListener(CreateLogUseCase createLogUseCase, RabbitProperties rabbitProperties) {
+        this.createLogUseCase = createLogUseCase;
         this.rabbitProperties = rabbitProperties;
     }
 
@@ -29,7 +29,7 @@ public class BusListener implements BusMessageListener {
             String entity = messageMap.get("entity");
             String message = messageMap.get("message");
 
-            printLogUseCase.accept(entity, message);
+            createLogUseCase.accept(entity, message);
         } catch (JsonProcessingException e) {
             System.err.println("Error processing message payload: " + e.getMessage());
         }

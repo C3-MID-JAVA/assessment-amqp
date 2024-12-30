@@ -1,4 +1,4 @@
-package ec.com.sofka.account;
+package ec.com.sofka.appservice.account;
 
 import ec.com.sofka.Account;
 import ec.com.sofka.User;

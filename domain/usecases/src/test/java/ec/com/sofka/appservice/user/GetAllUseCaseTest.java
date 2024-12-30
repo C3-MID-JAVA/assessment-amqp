@@ -1,4 +1,4 @@
-package ec.com.sofka.user;
+package ec.com.sofka.appservice.user;
 
 import ec.com.sofka.User;
 import ec.com.sofka.appservice.user.GetAllUseCase;

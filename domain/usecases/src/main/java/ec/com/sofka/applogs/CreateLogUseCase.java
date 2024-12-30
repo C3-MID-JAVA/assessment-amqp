@@ -5,11 +5,11 @@ import ec.com.sofka.gateway.LogRepository;
 
 import java.time.LocalDateTime;
 
-public class PrintLogUseCase{
+public class CreateLogUseCase {
 
     private final LogRepository logRepository;
 
-    public PrintLogUseCase(LogRepository logRepository) {
+    public CreateLogUseCase(LogRepository logRepository) {
         this.logRepository = logRepository;
     }
 

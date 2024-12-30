@@ -17,6 +17,9 @@ public class LogEntity {
 
     private LocalDateTime timestamp;
 
+    public LogEntity() {
+    }
+
     public LogEntity(String message, String entity, LocalDateTime timestamp) {
         this.message = message;
         this.entity = entity;
