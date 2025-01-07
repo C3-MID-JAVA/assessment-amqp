@@ -6,9 +6,10 @@ import org.springframework.context.annotation.FilterType;
 
 //17. Configure the same as you did for autogenerate beans in appservices
 @Configuration
-@ComponentScan( basePackages = "ec.com.sofka.applogs",
+@ComponentScan(basePackages = "ec.com.sofka.UC",
         includeFilters = {
-                @ComponentScan.Filter(type= FilterType.REGEX, pattern = "^.+UseCase$")
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "^.+UseCase$")
         })
 public class UseCaseConfig {
+
 }

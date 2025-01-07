@@ -6,8 +6,8 @@ findProject(':app-service').projectDir = file('./applications/app-service')
 include ':model'
 findProject(':model').projectDir = file('./domain/model')
 
-include ':usecases'
-findProject(':usecases').projectDir = file('./domain/usecases')
+include ':service-usecases'
+findProject(':service-usecases').projectDir = file('./domain/service-usecases')
 
 include ':mongo-repository'
 findProject(':mongo-repository').projectDir = file('./infrastructure/driven-adapters/mongo-repository')
@@ -26,3 +26,10 @@ findProject(':app-logs').projectDir = file('./applications/app-logs')
 //19. Add the new app related to logs: The producer
 include ':rabbit-listener-bus'
 findProject(':rabbit-listener-bus').projectDir = file('./infrastructure/entry-points/rabbit-listener-bus')
+
+include 'log-usecases'
+findProject(':log-usecases').projectDir = file('./domain/log-usecases')
+
+include 'rabbit-properties'
+findProject(':rabbit-properties').projectDir = file('./shared/rabbit-properties')
+

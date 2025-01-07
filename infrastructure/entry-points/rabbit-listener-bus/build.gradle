@@ -1,9 +1,9 @@
 dependencies {
-    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     //22. Add the RabbitMQ starter bc we are configure the listen behavior here
     implementation('org.springframework.boot:spring-boot-starter-amqp')
     //21. Don't forget to implement the usecases project bc the BusMessageListener lives there
-    implementation project(':usecases')
+    implementation project(':log-usecases')
 
     //22.  Don't forget the model for scooping
     implementation project(':model')
